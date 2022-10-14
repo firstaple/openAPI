@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <style>
+      .list {
+        border: solid 1px gray;
+        border-radius: 10px;
+        overflow: hidden;
+        clear: both;
+        margin-bottom: 5px;
+      }
+      .list p {
+        display: inline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>메뉴 리스트 입니다</h1>
+    <h3 id="NM">식당이름</h3>
+    <p>메뉴카테고리분류명-메뉴이름</p>
+    <button id="add">추가</button>
+
+    <script>
+      async function foodRstrGet(nextCount) {
+        const response = await fetch("./공공데이터.json");
+
+        let data = 0;
+        if (response.ok) {
+          data = await response.json();
+
+          const NM = document.querySelector("#NM");
+          NM.src = data.body[0].RSTR_NM;
+        }
+
+        const MenuResponse = await fetch("./공공데이터.json");
+
+        let menuData = 0;
+        if (MenuResponse.ok) {
+          menuData = await MenuResponse.json();
+
+          if (menuData.body[0].MENU_ID == data.body[0].MENU_ID) {
+            document.querySelector("body");
+          }
+        }
+
+        const menuCategori = menuData.body[0].MENU_CTGRY_LCLAS_NM;
+        const menuName = menuData.body[0].MENU_NM;
+        const rstrName = menuData.body[0].RSTR_NM;
+
+        function menuTag(menuCategori, rstrName, menuName) {
+          const menuCategoriTag = document.createElement("p");
+          menuCategoriTag.innerHTML = menuCategori;
+          const menuNameTag = document.createElement("p");
+          menuNameTag.innerHTML = menuName;
+          const rstrNameTag = document.createElement("h3");
+          rstrNameTag.innerHTML = rstrName;
+
+          const menuBox = document.createElement("div");
+          menuBox.append(rstrNameTag);
+          menuBox.append(menuCategoriTag);
+          menuBox.append(" - ");
+          menuBox.append(menuNameTag);
+          menuBox.classList.add("list");
+
+          document.querySelector("body").append(menuBox);
+        }
+
+        for (let i = nextCount; i < nextCount + 5; i++) {
+          let count = 0;
+          for (let j = i; j < 182544; j++) {
+            if (menuData.body[j].MENU_ID == data.body[i].MENU_ID) {
+              count = j;
+              break;
+            }
+          }
+          menuTag(
+            menuData.body[count].MENU_CTGRY_LCLAS_NM,
+            menuData.body[count].RSTR_NM,
+            menuData.body[count].MENU_NM
+          );
+        }
+      }
+      foodRstrGet(0);
+
+      let nextCount = 0;
+      const button = document.querySelector("#add");
+      button.addEventListener("click", () => {
+        nextCount += 5;
+        foodRstrGet(nextCount);
+      });
+    </script>
+  </body>
+</html>
